@@ -27,6 +27,8 @@
         , close_connection/1
         , push_notification/3
         , push_notification/4
+%%        , bulk_push_notification/4
+        , async_push_notification/4
         , push_notification_token/4
         , push_notification_token/5
         , default_headers/0
@@ -105,17 +107,32 @@ push_notification(ConnectionId, DeviceId, JSONMap) ->
 
 %% @doc Push notification to certificate APNs Connection.
 -spec push_notification( apns_connection:name() | pid()
-                       , device_id()
-                       , json()
-                       , headers()
-                       ) -> response() | {error, not_connection_owner}.
+    , device_id()
+    , json()
+    , headers()
+) -> response() | {error, not_connection_owner}.
 push_notification(ConnectionId, DeviceId, JSONMap, Headers) ->
-  Notification = jsx:encode(JSONMap),
-  apns_connection:push_notification( ConnectionId
-                                   , DeviceId
-                                   , Notification
-                                   , Headers
-                                   ).
+    Notification = jsx:encode(JSONMap),
+    apns_connection:push_notification( ConnectionId
+        , DeviceId
+        , Notification
+        , Headers
+    ).
+
+%% @doc Async push notification to certificate APNs Connection.
+-spec async_push_notification( apns_connection:name() | pid()
+    , list()
+    , json()
+    , headers()
+) -> response() | {error, not_connection_owner}.
+async_push_notification(ConnectionId, DeviceId, JSONMap, Headers) ->
+    Notification = jsx:encode(JSONMap),
+    apns_connection:async_push_notification(
+        ConnectionId
+        , DeviceId
+        , Notification
+        , Headers
+    ).
 
 %% @doc Push notification to APNs with authentication token. It will use the
 %%      headers provided on the environment variables.
